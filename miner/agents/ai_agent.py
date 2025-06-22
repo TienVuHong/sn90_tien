@@ -284,28 +284,25 @@ class AIAgent(BaseAgent):
         Use AI to reason about the statement given the analysis and data.
         """
         reasoning_prompt = f"""
-        You are a financial prediction verification expert. Based on the data provided, determine if this prediction statement is TRUE, FALSE, or PENDING.
+        You are a research and analysis expert. Based on the statement provided, search for sources on the internet, analyze and determine if this prediction statement is TRUE, FALSE, or PENDING.
         
         Statement: {statement.statement}
         End Date: {statement.end_date}
-        
-        Analysis: {json.dumps(analysis, indent=2)}
-        Collected Data: {json.dumps(data, indent=2)}
-        
         Current Date: {datetime.now(timezone.utc).isoformat()}
         
         Consider:
         1. Has the deadline passed?
         2. If yes, did the condition specified in the statement occur?
         3. What is your confidence level (0-100)?
-        4. What sources support your conclusion? Mention at least 3 different sources, prioritize information from "coingecko", "coinmarketcap", "yahoo", "bloomberg", "reuters", "binance", "coinbase", "kraken".
+        4. What sources support your conclusion? Mention at least 3 different sources.
+        5. If statement is about crypto price prediction, prefer getting data through api and analyze information from "coingecko.com", "coinmarketcap.com", "bloomberg.com", "reuters.com", "coinbase.com", "kraken.com".
         
         Respond in JSON format:
         {{
             "resolution": "TRUE|FALSE|PENDING",
             "confidence": 85,
             "summary": "Detailed explanation of your reasoning...",
-            "sources": ["source1", "source2"],
+            "sources": ["https://example.com/evidence", "https://api.coingecko.com/api/v3/simple/price"],
             "key_evidence": "What evidence supports this conclusion"
         }}
         """
