@@ -292,13 +292,13 @@ class AIAgent(BaseAgent):
         
         Consider:
         1. Has the deadline passed? If yes, search through the internet for evidence and determine the resolution. If not, search through the internet and predict the resolution
-        2. What is your confidence level (0-100)?
+        2. What is your confidence level (0-100)? For the event that happended, give high confidence.
         3. What sources support your conclusion? Mention at least 3 different sources.
         4. If statement is about crypto price prediction, prefer getting data through api and analyze information from "coingecko.com", "coinmarketcap.com", "bloomberg.com", "reuters.com", "coinbase.com", "kraken.com".
         
         Respond in JSON format:
         {{
-            "resolution": "TRUE|FALSE|PENDING",
+            "resolution": "TRUE|FALSE",
             "confidence": 85,
             "summary": "Detailed explanation of your reasoning...",
             "sources": ["https://example.com/evidence", "https://api.coingecko.com/api/v3/simple/price"],
