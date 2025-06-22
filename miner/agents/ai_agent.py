@@ -337,7 +337,7 @@ class AIAgent(BaseAgent):
             }
             
             payload = {
-                "model": "gpt-4o",
+                "model": "deepseek-chat",
                 "messages": [
                     {
                         "role": "system",
@@ -356,7 +356,7 @@ class AIAgent(BaseAgent):
                 payload["response_format"] = {"type": "json_object"}
             
             async with aiohttp.ClientSession(timeout=aiohttp.ClientTimeout(total=self.timeout)) as session:
-                async with session.post("https://api.openai.com/v1/chat/completions", 
+                async with session.post("https://api.deepseek.com/v1/chat/completions", 
                                       headers=headers, 
                                       json=payload) as response:
                     if response.status == 200:
