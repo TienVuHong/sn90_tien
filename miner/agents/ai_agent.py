@@ -143,7 +143,7 @@ class AIAgent(BaseAgent):
         # data = await self._collect_data(analysis)
         
         # Step 3: Use AI to reason about the outcome
-        reasoning_result = await self._ai_reasoning(statement, Dict(), Dict())
+        reasoning_result = await self._ai_reasoning(statement, None, None)
         
         return reasoning_result
     
