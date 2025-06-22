@@ -137,13 +137,13 @@ class AIAgent(BaseAgent):
         4. Uses AI to reason about the outcome
         """
         # Step 1: Analyze statement to understand what we need
-        analysis = await self._analyze_statement(statement)
+        # analysis = await self._analyze_statement(statement)
         
         # Step 2: Collect relevant data
-        data = await self._collect_data(analysis)
+        # data = await self._collect_data(analysis)
         
         # Step 3: Use AI to reason about the outcome
-        reasoning_result = await self._ai_reasoning(statement, analysis, data)
+        reasoning_result = await self._ai_reasoning(statement, Dict(), Dict())
         
         return reasoning_result
     
