@@ -333,7 +333,7 @@ class AIAgent(BaseAgent):
             }
             
             payload = {
-                "model": "deepseek-reasoner",
+                "model": "deepseek-chat",
                 "messages": [
                     {
                         "role": "system",
