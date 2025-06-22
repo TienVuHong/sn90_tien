@@ -291,11 +291,10 @@ class AIAgent(BaseAgent):
         Current Date: {datetime.now(timezone.utc).isoformat()}
         
         Consider:
-        1. Has the deadline passed?
-        2. If yes, did the condition specified in the statement occur?
-        3. What is your confidence level (0-100)?
-        4. What sources support your conclusion? Mention at least 3 different sources.
-        5. If statement is about crypto price prediction, prefer getting data through api and analyze information from "coingecko.com", "coinmarketcap.com", "bloomberg.com", "reuters.com", "coinbase.com", "kraken.com".
+        1. Has the deadline passed? If yes, search through the internet for evidence and determine the resolution. If not, search through the internet and predict the resolution
+        2. What is your confidence level (0-100)?
+        3. What sources support your conclusion? Mention at least 3 different sources.
+        4. If statement is about crypto price prediction, prefer getting data through api and analyze information from "coingecko.com", "coinmarketcap.com", "bloomberg.com", "reuters.com", "coinbase.com", "kraken.com".
         
         Respond in JSON format:
         {{
@@ -334,11 +333,11 @@ class AIAgent(BaseAgent):
             }
             
             payload = {
-                "model": "deepseek-chat",
+                "model": "deepseek-reasoner",
                 "messages": [
                     {
                         "role": "system",
-                        "content": "You are a financial prediction verification expert. Analyze statements accurately and provide structured responses in the requested JSON format."
+                        "content": "You are a research and analysis expert. Analyze statements accurately and provide structured responses in the requested JSON format."
                     },
                     {
                         "role": "user",
