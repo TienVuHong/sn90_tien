@@ -298,7 +298,7 @@ class AIAgent(BaseAgent):
         1. Has the deadline passed?
         2. If yes, did the condition specified in the statement occur?
         3. What is your confidence level (0-100)?
-        4. What sources support your conclusion?
+        4. What sources support your conclusion? Mention at least 3 different sources, prioritize information from "coingecko", "coinmarketcap", "yahoo", "bloomberg", "reuters", "binance", "coinbase", "kraken".
         
         Respond in JSON format:
         {{
