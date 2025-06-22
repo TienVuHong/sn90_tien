@@ -76,7 +76,7 @@ class AIAgent(BaseAgent):
             statement_id = statement.id
         
         logger.info("Starting AI verification", 
-                   statement=statement_text[:60] + "...",
+                   statement=statement_text,
                    strategy=self.strategy,
                    statement_id=statement_id)
         
@@ -365,7 +365,12 @@ class AIAgent(BaseAgent):
                         
                         if response_format == "json":
                             try:
-                                return json.loads(content)
+                                ret = json.loads(content)
+                                print('prompt ============================================================== ')
+                                print(prompt)
+                                print('response ============================================================== ')
+                                print(json.dumps(ret, indent=4))
+                                return ret
                             except json.JSONDecodeError:
                                 logger.error("Failed to parse OpenAI JSON response", content=content)
                                 return {"error": "Invalid JSON response from OpenAI"}
