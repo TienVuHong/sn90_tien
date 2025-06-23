@@ -259,6 +259,13 @@ class AIAgent(BaseAgent):
         """
         Collect relevant data based on the analysis.
         """
+        search_api_key='AIzaSyBRISOQWpXEHjXF075b_hlwAoLxE3LW1LQ'
+        cx='94b15340483004d1d'
+        '''
+        <script async src="https://cse.google.com/cse.js?cx=94b15340483004d1d">
+        </script>
+        <div class="gcse-search"></div>
+        '''
         data = {}
         
         # Crypto price data
