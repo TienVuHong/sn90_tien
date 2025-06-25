@@ -1,6 +1,7 @@
 import aiohttp
 import asyncio
 import json
+import httpx
 
 openai_api_key = 'sk-223e1212859d4cd0b4b83d3ee472bc6d'
 timeout = 60
@@ -27,6 +28,119 @@ Respond in JSON format:
     "key_evidence": "What evidence supports this conclusion"
 }}
 """
+
+# async def resolve_statement():
+#     """
+#     Call the resolve endpoint to get resolution for a statement.
+    
+#     Args:
+#         statement: Statement to resolve.
+        
+#     Returns:
+#         Resolution data from the API.
+#     """
+#     client = httpx.AsyncClient(timeout=timeout)
+#     api_url = "https://degenbrain.com"
+#     try:
+#         # Build request payload
+#         payload = {
+#             "statement": "Will the New York Yankees win the 2024 World Series?",
+#             "createdAt": "2025-06-22T18:21:48.302943+00:00",
+#             "initialValue": None,
+#             "direction": None,
+#             "end_date": "2024-11-01T23:59:59Z"
+#         }
+        
+#         print("Resolving statement via API " + payload['statement'] + f"{api_url}/resolve")
+        
+#         # Make API call
+#         response = await client.post(
+#             f"{api_url}/resolve",
+#             json=payload
+#         )
+#         response.raise_for_status()
+        
+#         result = response.json()
+#         print("result:\n" + result)
+#         print("Statement resolved" + result.get("resolution") + result.get("confidence"))
+        
+#         return result
+        
+#     except httpx.HTTPStatusError as e:
+#         print("API returned error status")
+#         raise
+#     except Exception as e:
+#         print("Failed to resolve statement", error=str(e))
+#         raise
+
+def call_degenbrain_api():
+    requests = httpx.Client(timeout=timeout)
+    url = "https://degenbrain.com/api/resolve-job/start/"
+    
+    payload = {
+        "statement": "ETH blockchain had over 800,000 active validators at the end of 2024.",
+        "createdAt": "2025-05-26T18:14:00.000Z"
+    }
+
+    try:
+        response = requests.post(url, json=payload)
+        response.raise_for_status()
+        result = response.json()
+        print("result:")
+        print(result)
+        return result
+    except httpx.HTTPStatusError as e:
+        print("1 API returned error status")
+        raise
+    except requests.exceptions.RequestException as e:
+        print(f"Có lỗi khi gọi API: {e}")
+        return None
+
+def check_job_status(job_id):
+    requests = httpx.Client(timeout=timeout)
+    url = f"https://degenbrain.com/api/resolve-job/status/{job_id}/"
+    
+    try:
+        response = requests.get(url)
+        result = response.json()
+        # print("result:")
+        # print(result)
+        return result
+    except httpx.HTTPStatusError as e:
+        print("2 API returned error status")
+        raise
+    except requests.exceptions.RequestException as e:
+        print(f"Có lỗi khi kiểm tra status: {e}")
+        return None
+
+def process_job():
+    # Bắt đầu job
+    start_result = call_degenbrain_api()
+    if not start_result:
+        print("Không thể bắt đầu job")
+        return
+    
+    # Lấy job_id từ response
+    job_id = start_result.get('job_id')
+    if not job_id:
+        print("Không tìm thấy job ID trong response")
+        return
+    
+    print(f"Job đã được tạo với ID: {job_id}")
+    
+    # Kiểm tra status
+    import time
+    while True:
+        status_result = check_job_status(job_id)
+        if status_result:
+            print(f"Trạng thái job: {status_result}")
+            if status_result['status'] != 'completed':
+                time.sleep(1)
+                continue
+            else:
+                break
+
+        
 
 async def _call_openai(prompt: str, response_format: str = "text"):
     """Call OpenAI API for reasoning."""
@@ -94,7 +208,9 @@ async def _call_openai(prompt: str, response_format: str = "text"):
         return {"error": f"OpenAI API call failed: {str(e)}"}
     
 def main():
-    asyncio.run(_call_openai(prompt=reasoning_prompt, response_format='json'))
+    # asyncio.run(_call_openai(prompt=reasoning_prompt, response_format='json'))
+    # asyncio.run(resolve_statement())
+    process_job()
 
 if __name__ == "__main__":
     main()
