@@ -182,7 +182,7 @@ class AIAgent(BaseAgent):
                     logger.warning("AI reasoning requested but no API keys configured")
                     return self._create_basic_pending_response(statement)
                 # return await self._verify_with_ai_reasoning(statement)
-                return self._verify_with_degen_brain(statement.statement)
+                return self._verify_with_degen_brain(statement)
             elif self.strategy == "hybrid":
                 return await self._verify_hybrid(statement, statement_id)
             else:
@@ -195,8 +195,9 @@ class AIAgent(BaseAgent):
             logger.error("AI verification failed", error=str(e))
             return self._create_error_response(statement, str(e))
     
-    def _verify_with_degen_brain(self, statement) -> MinerResponse:
-        degen_response = get_response(statement)
+    def _verify_with_degen_brain(self, statement: Statement) -> MinerResponse:
+        statement_text = statement.statement
+        degen_response = get_response(statement_text)
         if (degen_response):
             return self._convert_ai_response(statement, degen_response)
         
@@ -219,7 +220,8 @@ class AIAgent(BaseAgent):
         if (not status_result):
             print("Fail while check status job")
             return None
-        insert_data(statement, status_result['result'])
+        print(status_result['result'])
+        insert_data(statement_text, status_result['result'])
         return self._convert_ai_response(statement, status_result['result'])
 
     async def _verify_with_brainstorm(self, statement: Statement) -> MinerResponse:
