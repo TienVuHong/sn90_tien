@@ -54,13 +54,13 @@ def get_response(statement):
         return None
 
 ######################## Degen API ##############################
-def call_degenbrain_api():
+def call_degenbrain_api(statement: Statement):
     requests = httpx.Client(timeout=30)
     url = "https://degenbrain.com/api/resolve-job/start/"
     
     payload = {
-        "statement": "ETH blockchain had over 800,000 active validators at the end of 2024.",
-        "createdAt": "2025-05-26T18:14:00.000Z"
+        "statement": statement.statement,
+        "createdAt": statement.createdAt
     }
 
     try:
@@ -211,7 +211,7 @@ class AIAgent(BaseAgent):
             return self._convert_ai_response(statement, degen_response)
         
         # Bắt đầu job
-        start_result = call_degenbrain_api()
+        start_result = call_degenbrain_api(statement)
         if not start_result:
             print("Không thể bắt đầu job")
             return None
