@@ -19,17 +19,9 @@ from shared.types import Statement, MinerResponse, Resolution
 logger = structlog.get_logger()
 
 ########################## Database ############################
-conn = sqlite3.connect('sn90.db')
-cursor = conn.cursor()
-cursor.execute('''
-    CREATE TABLE IF NOT EXISTS Data_table (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        statement TEXT NOT NULL,
-        response TEXT NOT NULL
-    )
-''')
-
 def insert_data(statement, response_dict):
+    conn = sqlite3.connect('sn90.db')
+    cursor = conn.cursor()
     res = get_response(statement)
     if (res != None and response_dict['confidence'] <= res['confidence']):
         return
@@ -38,10 +30,14 @@ def insert_data(statement, response_dict):
         INSERT INTO Data_table (statement, response) VALUES (?, ?)
     ''', (statement, response_json))
     conn.commit()
+    conn.close()
 
 def get_response(statement):
+    conn = sqlite3.connect('sn90.db')
+    cursor = conn.cursor()
     cursor.execute('SELECT response FROM Data_table WHERE LOWER(statement) = LOWER(?)', (statement,))
     row = cursor.fetchone()
+    conn.close()
     if row:
         response_json = row[0]
         return json.loads(response_json)
