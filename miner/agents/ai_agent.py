@@ -182,7 +182,7 @@ class AIAgent(BaseAgent):
                     logger.warning("AI reasoning requested but no API keys configured")
                     return self._create_basic_pending_response(statement)
                 # return await self._verify_with_ai_reasoning(statement)
-                return self._verify_with_degen_brain(statement)
+                return self._verify_with_degen_brain(statement.statement)
             elif self.strategy == "hybrid":
                 return await self._verify_hybrid(statement, statement_id)
             else:
@@ -218,7 +218,7 @@ class AIAgent(BaseAgent):
         status_result = check_job_status(job_id)
         if (not status_result):
             print("Fail while check status job")
-            return
+            return None
         insert_data(statement, status_result['result'])
         return self._convert_ai_response(statement, status_result['result'])
 
