@@ -23,12 +23,21 @@ def insert_data(statement, response_dict):
     conn = sqlite3.connect('sn90.db')
     cursor = conn.cursor()
     res = get_response(statement)
-    if (res != None and response_dict['confidence'] <= res['confidence']):
-        return
-    response_json = json.dumps(response_dict)
-    cursor.execute('''
-        INSERT INTO Data_table (statement, response) VALUES (?, ?)
-    ''', (statement, response_json))
+    if res is not None:
+        # If the confidence is not better, do nothing
+        if response_dict['confidence'] <= res['confidence']:
+            conn.close()
+            return
+        
+        response_json = json.dumps(response_dict)
+        cursor.execute('''
+            UPDATE Data_table SET response = ? WHERE statement = ?
+        ''', (response_json, statement))
+    else:
+        response_json = json.dumps(response_dict)
+        cursor.execute('''
+            INSERT INTO Data_table (statement, response) VALUES (?, ?)
+        ''', (statement, response_json))
     conn.commit()
     conn.close()
 
