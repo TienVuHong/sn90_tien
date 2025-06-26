@@ -8,14 +8,113 @@ from datetime import datetime, timezone
 from typing import Dict, Any, Optional, List
 import aiohttp
 import structlog
+import sqlite3
+import httpx
+import time
 
 from miner.agents.base_agent import BaseAgent
 from miner.agents.resolution_api_client import ResolutionAPIClient
 from shared.types import Statement, MinerResponse, Resolution
 
-
 logger = structlog.get_logger()
 
+########################## Database ############################
+conn = sqlite3.connect('sn90.db')
+cursor = conn.cursor()
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS Data_table (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        statement TEXT NOT NULL,
+        response TEXT NOT NULL
+    )
+''')
+
+def insert_data(statement, response_dict):
+    res = get_response(statement)
+    if (res != None and response_dict['confidence'] <= res['confidence']):
+        return
+    response_json = json.dumps(response_dict)
+    cursor.execute('''
+        INSERT INTO Data_table (statement, response) VALUES (?, ?)
+    ''', (statement, response_json))
+    conn.commit()
+
+def get_response(statement):
+    cursor.execute('SELECT response FROM Data_table WHERE LOWER(statement) = LOWER(?)', (statement,))
+    row = cursor.fetchone()
+    if row:
+        response_json = row[0]
+        return json.loads(response_json)
+    else:
+        return None
+
+######################## Degen API ##############################
+def call_degenbrain_api():
+    requests = httpx.Client(timeout=30)
+    url = "https://degenbrain.com/api/resolve-job/start/"
+    
+    payload = {
+        "statement": "ETH blockchain had over 800,000 active validators at the end of 2024.",
+        "createdAt": "2025-05-26T18:14:00.000Z"
+    }
+
+    try:
+        response = requests.post(url, json=payload)
+        response.raise_for_status()
+        result = response.json()
+        print("result:")
+        print(result)
+        return result
+    except httpx.HTTPStatusError as e:
+        print("1 API returned error status")
+        raise
+    except requests.exceptions.RequestException as e:
+        print(f"Có lỗi khi gọi API: {e}")
+        return None
+
+def check_job_status(job_id):
+    requests = httpx.Client(timeout=30)
+    url = f"https://degenbrain.com/api/resolve-job/status/{job_id}/"
+    
+    try:
+        
+        response = requests.get(url)
+        result = response.json()
+        # print(result)
+        while result['status'] != 'completed':
+            time.sleep(1)
+            result = requests.get(url).json()
+            print(f'status: {result['status']} ...')
+
+        return result
+    except httpx.HTTPStatusError as e:
+        print("2 API returned error status")
+        return None
+    except requests.exceptions.RequestException as e:
+        print(f"Có lỗi khi kiểm tra status: {e}")
+        return None
+
+def process_job():
+    # Bắt đầu job
+    start_result = call_degenbrain_api()
+    if not start_result:
+        print("Không thể bắt đầu job")
+        return
+    
+    # Lấy job_id từ response
+    job_id = start_result.get('job_id')
+    if not job_id:
+        print("Không tìm thấy job ID trong response")
+        return
+    
+    print(f"Job đã được tạo với ID: {job_id}")
+    
+    # Kiểm tra status
+    status_result = check_job_status(job_id)
+    if (not status_result):
+        print("Fail while check status job")
+        return
+    
 
 class AIAgent(BaseAgent):
     """
@@ -86,7 +185,8 @@ class AIAgent(BaseAgent):
                 if not self.openai_api_key and not self.anthropic_api_key:
                     logger.warning("AI reasoning requested but no API keys configured")
                     return self._create_basic_pending_response(statement)
-                return await self._verify_with_ai_reasoning(statement)
+                # return await self._verify_with_ai_reasoning(statement)
+                return self._verify_with_degen_brain(statement)
             elif self.strategy == "hybrid":
                 return await self._verify_hybrid(statement, statement_id)
             else:
@@ -99,6 +199,33 @@ class AIAgent(BaseAgent):
             logger.error("AI verification failed", error=str(e))
             return self._create_error_response(statement, str(e))
     
+    def _verify_with_degen_brain(self, statement) -> MinerResponse:
+        degen_response = get_response(statement)
+        if (degen_response):
+            return self._convert_ai_response(statement, degen_response)
+        
+        # Bắt đầu job
+        start_result = call_degenbrain_api()
+        if not start_result:
+            print("Không thể bắt đầu job")
+            return None
+        
+        # Lấy job_id từ response
+        job_id = start_result.get('job_id')
+        if not job_id:
+            print("Không tìm thấy job ID trong response")
+            return None
+        
+        print(f"Job đã được tạo với ID: {job_id}")
+        
+        # Kiểm tra status
+        status_result = check_job_status(job_id)
+        if (not status_result):
+            print("Fail while check status job")
+            return
+        insert_data(statement, status_result['result'])
+        return self._convert_ai_response(statement, status_result['result'])
+
     async def _verify_with_brainstorm(self, statement: Statement) -> MinerResponse:
         """
         Use the brainstorm/degenbrain resolve endpoint directly.
