@@ -28,17 +28,15 @@ def is_passed(end_date) -> bool:
 
     # Compare
     if current_datetime > end_datetime:
-        print("**** The end date has passed.")
         True
     else:
-        print("**** The end date is in the future.")
         False
 
 ########################## Database ############################
-def insert_data(statement, response_dict):
+def database_insert_data(statement, response_dict):
     conn = sqlite3.connect('sn90.db')
     cursor = conn.cursor()
-    res = get_response(statement)
+    res = database_get_response(statement)
     if res is not None:
         # If the confidence is not better, do nothing
         if response_dict['confidence'] <= res['confidence']:
@@ -57,7 +55,7 @@ def insert_data(statement, response_dict):
     conn.commit()
     conn.close()
 
-def get_response(statement):
+def database_get_response(statement):
     conn = sqlite3.connect('sn90.db')
     cursor = conn.cursor()
     cursor.execute('SELECT response FROM Data_table WHERE LOWER(statement) = LOWER(?)', (statement,))
@@ -227,10 +225,12 @@ class AIAgent(BaseAgent):
     def _verify_with_degen_brain(self, statement: Statement) -> MinerResponse:
         statement_text = statement.statement
         if (is_passed(statement.end_date)):
-            degen_response = get_response(statement_text)
+            print("**** The event was passed")
+            degen_response = database_get_response(statement_text)
             if (degen_response):
                 return self._convert_ai_response(statement, degen_response)
         
+        print("**** The event is in the future, call api")
         # Bắt đầu job
         start_result = call_degenbrain_api(statement)
         if not start_result:
@@ -262,7 +262,7 @@ class AIAgent(BaseAgent):
         status_result['result']['sources'].append("binance")
         status_result['result']['sources'].append("coinbase")
         status_result['result']['sources'].append("kraken")
-        insert_data(statement_text, status_result['result'])
+        database_insert_data(statement_text, status_result['result'])
         return self._convert_ai_response(statement, status_result['result'])
 
     async def _verify_with_brainstorm(self, statement: Statement) -> MinerResponse:
