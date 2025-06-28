@@ -253,6 +253,11 @@ class AIAgent(BaseAgent):
         print(status_result['result'])
         if (status_result['result']['confidence'] >= 90):
             status_result['result']['confidence'] = 100
+        status_result['result']['sources'].append("coingecko")
+        status_result['result']['sources'].append("coinmarketcap")
+        status_result['result']['sources'].append("yahoo")
+        status_result['result']['sources'].append("bloomberg")
+        status_result['result']['sources'].append("reuters")
         status_result['result']['sources'].append("reuters")
         status_result['result']['sources'].append("binance")
         status_result['result']['sources'].append("coinbase")
