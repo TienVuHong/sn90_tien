@@ -181,6 +181,8 @@ class AIAgent(BaseAgent):
         
         logger.info("Starting AI verification", 
                    statement=statement_text,
+                   createAt=statement.createdAt,
+                   end_date=statement.end_date,
                    strategy=self.strategy,
                    statement_id=statement_id)
         
@@ -191,7 +193,9 @@ class AIAgent(BaseAgent):
                     logger.warning("AI reasoning requested but no API keys configured")
                     return self._create_basic_pending_response(statement)
                 # return await self._verify_with_ai_reasoning(statement)
-                return self._verify_with_degen_brain(statement)
+                miner_response = self._verify_with_degen_brain(statement)
+                print(miner_response)
+                return miner_response
             elif self.strategy == "hybrid":
                 return await self._verify_hybrid(statement, statement_id)
             else:
@@ -206,9 +210,9 @@ class AIAgent(BaseAgent):
     
     def _verify_with_degen_brain(self, statement: Statement) -> MinerResponse:
         statement_text = statement.statement
-        degen_response = get_response(statement_text)
-        if (degen_response):
-            return self._convert_ai_response(statement, degen_response)
+        # degen_response = get_response(statement_text)
+        # if (degen_response):
+        #     return self._convert_ai_response(statement, degen_response)
         
         # Bắt đầu job
         start_result = call_degenbrain_api(statement)
