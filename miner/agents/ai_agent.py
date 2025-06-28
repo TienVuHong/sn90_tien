@@ -18,6 +18,22 @@ from shared.types import Statement, MinerResponse, Resolution
 
 logger = structlog.get_logger()
 
+def is_passed(end_date) -> bool:
+    # Convert string to datetime object
+    end_datetime = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%SZ")
+    end_datetime = end_datetime.replace(tzinfo=timezone.utc)
+
+    # Get current UTC time
+    current_datetime = datetime.now(timezone.utc)
+
+    # Compare
+    if current_datetime > end_datetime:
+        print("**** The end date has passed.")
+        True
+    else:
+        print("**** The end date is in the future.")
+        False
+
 ########################## Database ############################
 def insert_data(statement, response_dict):
     conn = sqlite3.connect('sn90.db')
@@ -60,7 +76,7 @@ def call_degenbrain_api(statement: Statement):
     
     payload = {
         "statement": statement.statement,
-        "createdAt": statement.createdAt
+        "createdAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
     }
 
     try:
@@ -210,9 +226,10 @@ class AIAgent(BaseAgent):
     
     def _verify_with_degen_brain(self, statement: Statement) -> MinerResponse:
         statement_text = statement.statement
-        # degen_response = get_response(statement_text)
-        # if (degen_response):
-        #     return self._convert_ai_response(statement, degen_response)
+        if (is_passed(statement.end_date)):
+            degen_response = get_response(statement_text)
+            if (degen_response):
+                return self._convert_ai_response(statement, degen_response)
         
         # Bắt đầu job
         start_result = call_degenbrain_api(statement)
