@@ -1,36 +1,6 @@
 module.exports = {
   "apps": [
     {
-      "name": "validator",
-      "script": "run_validator.py",
-      "interpreter": "/home/subnet90/bittensor-subnet-90-brain/.venv/bin/python3",
-      "cwd": "/home/subnet90/bittensor-subnet-90-brain",
-      "env": {
-        "NETWORK": "finney",
-        "SUBNET_UID": "90",
-        "API_URL": "https://api.subnet90.com",
-        "LOG_LEVEL": "INFO",
-        "LOG_FORMAT": "json",
-        "LOG_DIR": "./logs",
-        "MAX_WORKERS": "4",
-        "REQUEST_TIMEOUT": "30",
-        "WALLET_NAME": "mainnet_wallet",
-        "HOTKEY_NAME": "owner",
-        "VALIDATOR_PORT": "8090",
-        "VALIDATOR_ID": "unique_validator_id",
-        "BOOTSTRAP_MODE": "true",
-        "MIN_STAKE_THRESHOLD": "1000"
-      },
-      "error_file": "./logs/validator.error.log",
-      "out_file": "./logs/validator.log",
-      "log_date_format": "YYYY-MM-DD HH:mm:ss",
-      "max_restarts": 20,
-      "min_uptime": "10s",
-      "restart_delay": 4000,
-      "autorestart": true,
-      "watch": false
-    },
-    {
       "name": "miner1",
       "script": "run_miner.py",
       "interpreter": "/home/subnet90/bittensor-subnet-90-brain/.venv/bin/python3",
