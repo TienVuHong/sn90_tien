@@ -20,7 +20,6 @@ logger = structlog.get_logger()
 
 def is_passed(end_date) -> bool:
     # Convert string to datetime object
-    print(f"end_date: {end_date}")
     end_datetime = datetime.strptime(end_date, "%Y-%m-%dT%H:%M:%SZ")
     end_datetime = end_datetime.replace(tzinfo=timezone.utc)
 
@@ -29,11 +28,9 @@ def is_passed(end_date) -> bool:
 
     # Compare
     if current_datetime > end_datetime:
-        print("**** Past")
-        True
+        return True
     else:
-        print("**** Future")
-        False
+        return False
 
 ########################## Database ############################
 def database_insert_data(statement, response_dict):
