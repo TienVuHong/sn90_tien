@@ -3,8 +3,8 @@ module.exports = {
     {
       "name": "miner1",
       "script": "run_miner.py",
-      "interpreter": "/home/subnet90/bittensor-subnet-90-brain/.venv/bin/python3",
-      "cwd": "/home/subnet90/bittensor-subnet-90-brain",
+      "interpreter": "/root/sn90_tien/.venv/bin/python3",
+      "cwd": "/root/sn90_tien",
       "env": {
         "NETWORK": "finney",
         "SUBNET_UID": "90",
@@ -32,8 +32,8 @@ module.exports = {
     {
       "name": "miner2",
       "script": "run_miner.py",
-      "interpreter": "/home/subnet90/bittensor-subnet-90-brain/.venv/bin/python3",
-      "cwd": "/home/subnet90/bittensor-subnet-90-brain",
+      "interpreter": "/root/sn90_tien/.venv/bin/python3",
+      "cwd": "/root/sn90_tien",
       "env": {
         "NETWORK": "finney",
         "SUBNET_UID": "90",
@@ -61,8 +61,8 @@ module.exports = {
     {
       "name": "miner3",
       "script": "run_miner.py",
-      "interpreter": "/home/subnet90/bittensor-subnet-90-brain/.venv/bin/python3",
-      "cwd": "/home/subnet90/bittensor-subnet-90-brain",
+      "interpreter": "/root/sn90_tien/.venv/bin/python3",
+      "cwd": "/root/sn90_tien",
       "env": {
         "NETWORK": "finney",
         "SUBNET_UID": "90",
@@ -90,8 +90,8 @@ module.exports = {
     {
       "name": "miner4",
       "script": "run_miner.py",
-      "interpreter": "/home/subnet90/bittensor-subnet-90-brain/.venv/bin/python3",
-      "cwd": "/home/subnet90/bittensor-subnet-90-brain",
+      "interpreter": "/root/sn90_tien/.venv/bin/python3",
+      "cwd": "/root/sn90_tien",
       "env": {
         "NETWORK": "finney",
         "SUBNET_UID": "90",
