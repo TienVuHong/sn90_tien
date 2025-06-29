@@ -251,8 +251,11 @@ class AIAgent(BaseAgent):
             print("Fail while check status job")
             return None
         print(status_result['result'])
-        if (status_result['result']['confidence'] >= 90):
-            status_result['result']['confidence'] = 100
+        if (status_result['result']['resolution'] == 'PENDING'):
+            status_result['result']['confidence'] = 50
+        else:
+            if (status_result['result']['confidence'] >= 90):
+                status_result['result']['confidence'] = 100
         status_result['result']['sources'].append("coingecko")
         status_result['result']['sources'].append("coinmarketcap")
         status_result['result']['sources'].append("yahoo")

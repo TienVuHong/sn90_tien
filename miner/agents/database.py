@@ -44,8 +44,40 @@ def get_response(statement):
         return json.loads(response_json)
     else:
         return None
+    
+def delete_data(statement):
+    conn = sqlite3.connect('sn90.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        DELETE FROM Data_table WHERE statement = ?
+    ''', (statement,))
+    
+    conn.commit()
+    conn.close()
+
+response_dict = {
+  "statement": "Will the betting favorite win the 2024 Belmont Stakes?",
+  "resolution": "FALSE",
+  "confidence": 100,
+  "summary": "The 2024 Belmont Stakes betting favorite, Sierra Leone, did not win the race. The winner was Sovereignty, who beat the favorite Journalism in the 2025 Belmont Stakes. Therefore, the prediction that the betting favorite would win the 2024 Belmont Stakes is false.",
+  "target_date": None,
+  "target_value": None,
+  "current_value": None,
+  "direction_inferred": None,
+  "sources": [
+    "Google Search",
+    "coingecko", "coinmarketcap", "yahoo", "bloomberg",
+    "reuters", "binance", "coinbase", "kraken",
+    "https://www.latimes.com/sports/live/belmont-stakes-live-updates-start-time-betting-odds-results",
+    "https://www.nyra.com/belmont-stakes/",
+    "https://www.cbssports.com/general/news/belmont-stakes-2024-odds-picks-post-draw-mystik-dan-seize-the-grey-mindframe-sierra-leone-predictions/",
+    "https://www.foxsports.com/stories/other/2025-belmont-stakes-odds-predictions-favorites-picks-more",
+    "https://www.cbssports.com/general/news/belmont-stakes-2025-predictions-odds-best-win-place-show-trifecta-exacta-plus-superfecta-expert-picks/"
+  ]
+}
+
 result = [
-{"statement": "Will Bitcoin close above $90,000 by May 12, 2025?", "resolution": "PENDING", "confidence": 100, "summary": "The threshold crossing status is unknown, and the market close date has passed without confirmation of crossing. The prediction remains unresolved as PENDING.", "target_date": "2025-05-12T00:00:00Z", "target_value": 90000, "current_value": 107340, "direction_inferred": "above", "sources": ["CoinGecko", "coinmarketcap", "coinbase", "reuters", "binance", "coinbase", "kraken"]},
 {"statement": "Will the New York Yankees win the 2024 World Series?", "resolution": "FALSE", "confidence": 100, "summary": "The New York Yankees did not win the 2024 World Series. The available data confirms that they have won 27 titles historically, but there is no indication of a 2024 victory. This makes the prediction false.", "target_date": "2024-10-01T00:00:00Z", "target_value": None, "current_value": None, "direction_inferred": None, "sources": ["Google Search", "coingecko", "coinmarketcap", "coinbase", "https://www.espn.com/mlb/story/_/id/39806597/who-won-most-world-series-titles-mlb-history", "https://en.wikipedia.org/wiki/List_of_World_Series_champions", "https://www.mlb.com/yankees/standings", "https://en.wikipedia.org/wiki/2024_World_Series", "https://www.reddit.com/r/mlb/comments/1g7q5mg/official_the_new_york_yankees_advance_to_the_2024/"]},
 {"statement": "Will Joe Biden drop out of the 2024 presidential race before August 1, 2024?", "resolution": "TRUE", "confidence": 100, "summary": "Joe Biden announced his withdrawal from the 2024 United States presidential election on July 21, 2024. This occurred before the deadline of August 1, 2024. Therefore, the prediction is true.", "target_date": "2024-07-31T23:59:59Z", "target_value": None, "current_value": None, "direction_inferred": None, "sources": ["Google Search", "coingecko", "coinmarketcap", "coinbase", "https://en.wikipedia.org/wiki/Withdrawal_of_Joe_Biden_from_the_2024_United_States_presidential_election", "https://www.texastribune.org/2024/07/19/biden-texas-presidential-ballot-election-law/", "https://www.cnn.com/politics/live-news/joe-biden-election-drop-out-07-22-24", "https://www.dispatch.com/story/news/politics/elections/2024/07/21/biden-dropped-out-will-harris-another-democrat-make-the-ohio-ballot/74490691007/", "https://ballotpedia.org/State_laws_and_party_rules_on_replacing_a_presidential_nominee,_2024"]},
 {"statement": "Will Bitcoin close above $100,000 by October 10, 2025?", "resolution": "PENDING", "confidence": 100, "summary": "The prediction is about whether Bitcoin will close above $100,000 by October 10, 2025. The current date is June 26, 2025, and the market close date is October 10, 2025. The current price of Bitcoin is $107,341, which is above the $100,000 threshold. However, the prediction is about the closing price on October 10, 2025. Since the target date is in the future and the closing price on that date is unknown, the prediction remains pending. The prediction is pending.", "target_date": "2025-10-10T00:00:00Z", "target_value": 100000, "current_value": 107341, "direction_inferred": "above", "sources": ["CoinGecko", "reuters", "binance", "coinbase", "kraken"]},
@@ -59,8 +91,10 @@ result = [
 {"statement": "Will Bitcoin close above $70,000 by March 22, 2025?", "resolution": "FALSE", "confidence": 100, "summary": "The prediction required Bitcoin to close above $70,000 by March 22, 2025. The current time is past the target date, and there is no information confirming that Bitcoin closed above $70,000 by the specified date. The prediction is false.", "target_date": "2025-03-22T00:00:00Z", "target_value": 70000, "current_value": 107504, "direction_inferred": "above", "sources": ["CoinGecko", "coinmarketcap", "coinbase", "reuters", "binance", "coinbase", "kraken"]}
 ]
 
-for ret in result:
-    insert_data(ret["statement"], ret)
+# for ret in result:
+#     insert_data(ret["statement"], ret)
+# insert_data("Will the betting favorite win the 2024 Belmont Stakes?", response_dict)
+# delete_data("Will Bitcoin close above $90,000 by September 24, 2025?")
 # Example usage
 # insert_data("Hello", {"reply": "Hi there!", "emotion": "happy", "confidence": 90})
 # insert_data("What's your name?", {"reply": "I'm ChatGPT.", "emotion": "neutral", "confidence": 80})
