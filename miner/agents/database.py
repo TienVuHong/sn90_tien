@@ -77,6 +77,8 @@ response_dict = {
   ]
 }
 
+res = {"statement": "Will Bitcoin close above $70,000 by March 22, 2025?", "resolution": "FALSE", "confidence": 100, "summary": "The prediction required Bitcoin to close above $70,000 by March 22, 2025. The current time is past the target date, and there is no information confirming that Bitcoin closed above $70,000 by the specified date. The prediction is false.", "target_date": "2025-03-22T00:00:00Z", "target_value": 70000, "current_value": 107504, "direction_inferred": "above", "sources": ["CoinGecko", "coinmarketcap", "reuters", "binance", "coinbase", "kraken"]}
+
 result = [
 {"statement": "Will the New York Yankees win the 2024 World Series?", "resolution": "FALSE", "confidence": 100, "summary": "The New York Yankees did not win the 2024 World Series. The available data confirms that they have won 27 titles historically, but there is no indication of a 2024 victory. This makes the prediction false.", "target_date": "2024-10-01T00:00:00Z", "target_value": None, "current_value": None, "direction_inferred": None, "sources": ["Google Search", "coingecko", "coinmarketcap", "coinbase", "https://www.espn.com/mlb/story/_/id/39806597/who-won-most-world-series-titles-mlb-history", "https://en.wikipedia.org/wiki/List_of_World_Series_champions", "https://www.mlb.com/yankees/standings", "https://en.wikipedia.org/wiki/2024_World_Series", "https://www.reddit.com/r/mlb/comments/1g7q5mg/official_the_new_york_yankees_advance_to_the_2024/"]},
 {"statement": "Will Joe Biden drop out of the 2024 presidential race before August 1, 2024?", "resolution": "TRUE", "confidence": 100, "summary": "Joe Biden announced his withdrawal from the 2024 United States presidential election on July 21, 2024. This occurred before the deadline of August 1, 2024. Therefore, the prediction is true.", "target_date": "2024-07-31T23:59:59Z", "target_value": None, "current_value": None, "direction_inferred": None, "sources": ["Google Search", "coingecko", "coinmarketcap", "coinbase", "https://en.wikipedia.org/wiki/Withdrawal_of_Joe_Biden_from_the_2024_United_States_presidential_election", "https://www.texastribune.org/2024/07/19/biden-texas-presidential-ballot-election-law/", "https://www.cnn.com/politics/live-news/joe-biden-election-drop-out-07-22-24", "https://www.dispatch.com/story/news/politics/elections/2024/07/21/biden-dropped-out-will-harris-another-democrat-make-the-ohio-ballot/74490691007/", "https://ballotpedia.org/State_laws_and_party_rules_on_replacing_a_presidential_nominee,_2024"]},
@@ -93,8 +95,8 @@ result = [
 
 # for ret in result:
 #     insert_data(ret["statement"], ret)
-# insert_data("Will the betting favorite win the 2024 Belmont Stakes?", response_dict)
-# delete_data("Will Bitcoin close above $90,000 by September 24, 2025?")
+# insert_data("Will Bitcoin close above $70,000 by March 22, 2025?", res)
+delete_data("Will Bitcoin close above $80,000 by July 03, 2025?")
 # Example usage
 # insert_data("Hello", {"reply": "Hi there!", "emotion": "happy", "confidence": 90})
 # insert_data("What's your name?", {"reply": "I'm ChatGPT.", "emotion": "neutral", "confidence": 80})

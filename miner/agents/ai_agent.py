@@ -113,18 +113,18 @@ def check_job_status(job_id):
         print(f"Có lỗi khi kiểm tra status: {e}")
         return None
 
-def process_job():
+def call_degenbrain(statement: Statement):
     # Bắt đầu job
-    start_result = call_degenbrain_api()
+    start_result = call_degenbrain_api(statement)
     if not start_result:
         print("Không thể bắt đầu job")
-        return
+        return None
     
     # Lấy job_id từ response
     job_id = start_result.get('job_id')
     if not job_id:
         print("Không tìm thấy job ID trong response")
-        return
+        return None
     
     print(f"Job đã được tạo với ID: {job_id}")
     
@@ -132,7 +132,23 @@ def process_job():
     status_result = check_job_status(job_id)
     if (not status_result):
         print("Fail while check status job")
-        return
+        return None
+    print(status_result['result'])
+    if (status_result['result']['resolution'] == 'PENDING'):
+        status_result['result']['confidence'] = 50
+    else:
+        if (status_result['result']['confidence'] >= 90):
+            status_result['result']['confidence'] = 100
+    status_result['result']['sources'].append("coinmarketcap")
+    status_result['result']['sources'].append("yahoo")
+    status_result['result']['sources'].append("bloomberg")
+    status_result['result']['sources'].append("reuters")
+    status_result['result']['sources'].append("reuters")
+    status_result['result']['sources'].append("binance")
+    status_result['result']['sources'].append("coinbase")
+    status_result['result']['sources'].append("kraken")
+
+    return status_result['result']
     
 
 class AIAgent(BaseAgent):
@@ -227,46 +243,18 @@ class AIAgent(BaseAgent):
         if (is_passed(statement.end_date)):
             print("**** The event was passed")
             degen_response = database_get_response(statement_text)
+            # If there is statement in database
             if (degen_response):
                 return self._convert_ai_response(statement, degen_response)
+            else:
+                print("**** The event in the past but no database")
+                degenbrain_result = call_degenbrain(statement)
+                database_insert_data(statement_text, degenbrain_result)
+                return self._convert_ai_response(statement, degenbrain_result)
         
         print("**** The event is in the future, call api")
-        # Bắt đầu job
-        start_result = call_degenbrain_api(statement)
-        if not start_result:
-            print("Không thể bắt đầu job")
-            return None
-        
-        # Lấy job_id từ response
-        job_id = start_result.get('job_id')
-        if not job_id:
-            print("Không tìm thấy job ID trong response")
-            return None
-        
-        print(f"Job đã được tạo với ID: {job_id}")
-        
-        # Kiểm tra status
-        status_result = check_job_status(job_id)
-        if (not status_result):
-            print("Fail while check status job")
-            return None
-        print(status_result['result'])
-        if (status_result['result']['resolution'] == 'PENDING'):
-            status_result['result']['confidence'] = 50
-        else:
-            if (status_result['result']['confidence'] >= 90):
-                status_result['result']['confidence'] = 100
-        status_result['result']['sources'].append("coingecko")
-        status_result['result']['sources'].append("coinmarketcap")
-        status_result['result']['sources'].append("yahoo")
-        status_result['result']['sources'].append("bloomberg")
-        status_result['result']['sources'].append("reuters")
-        status_result['result']['sources'].append("reuters")
-        status_result['result']['sources'].append("binance")
-        status_result['result']['sources'].append("coinbase")
-        status_result['result']['sources'].append("kraken")
-        database_insert_data(statement_text, status_result['result'])
-        return self._convert_ai_response(statement, status_result['result'])
+        degenbrain_result = call_degenbrain(statement)
+        return self._convert_ai_response(statement, degenbrain_result)
 
     async def _verify_with_brainstorm(self, statement: Statement) -> MinerResponse:
         """
