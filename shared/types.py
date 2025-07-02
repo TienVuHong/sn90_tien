@@ -201,7 +201,7 @@ class SubnetConfig:
     consensus_threshold: float = 0.7
     
     # Miner settings
-    miner_agent: str = "hybrid"
+    miner_agent: str = "dummy"
     miner_port: int = 8091
     verification_timeout: int = 30
     cache_duration: int = 300
@@ -225,7 +225,7 @@ class SubnetConfig:
             query_timeout=int(env_dict.get("QUERY_TIMEOUT", "60")),
             min_miners_required=int(env_dict.get("MIN_MINERS_REQUIRED", "3")),
             consensus_threshold=float(env_dict.get("CONSENSUS_THRESHOLD", "0.7")),
-            miner_agent=env_dict.get("MINER_AGENT", "hybrid"),
+            miner_agent=env_dict.get("MINER_AGENT", "dummy"),
             miner_port=int(env_dict.get("MINER_PORT", "8091")),
             verification_timeout=int(env_dict.get("VERIFICATION_TIMEOUT", "30")),
             cache_duration=int(env_dict.get("CACHE_DURATION", "300")),

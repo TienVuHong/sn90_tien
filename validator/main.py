@@ -164,9 +164,9 @@ class Validator:
                 logger.warning("No miner responses received")
                 return
             
-            # Calculate consensus
+            # Calculate consensus with coldkey-based Sybil protection
             validation_result = self.weights_calculator.calculate_consensus(
-                statement, responses
+                statement, responses, metagraph=self.bt_validator.metagraph
             )
             
             # Log results

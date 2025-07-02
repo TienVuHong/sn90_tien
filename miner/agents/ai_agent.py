@@ -41,7 +41,7 @@ class AIAgent(BaseAgent):
         self.alpha_vantage_api_key = config.get("alpha_vantage_api_key")
         
         # Strategy Configuration
-        self.strategy = config.get("strategy", "ai_reasoning")  # "ai_reasoning", "hybrid", or "dummy"
+        self.strategy = config.get("strategy", "ai_reasoning")
         self.timeout = config.get("timeout", 30)
         
         # Resolution API Configuration
@@ -81,19 +81,10 @@ class AIAgent(BaseAgent):
                    statement_id=statement_id)
         
         try:
-            if self.strategy == "ai_reasoning":
-                # Check if AI keys are configured
-                if not self.openai_api_key and not self.anthropic_api_key:
-                    logger.warning("AI reasoning requested but no API keys configured")
-                    return self._create_basic_pending_response(statement)
-                return await self._verify_with_ai_reasoning(statement)
-            elif self.strategy == "hybrid":
-                return await self._verify_hybrid(statement, statement_id)
-            else:
-                logger.warning("Unknown strategy, falling back to ai_reasoning", strategy=self.strategy)
-                if not self.openai_api_key and not self.anthropic_api_key:
-                    return self._create_basic_pending_response(statement)
-                return await self._verify_with_ai_reasoning(statement)
+            if not self.openai_api_key and not self.anthropic_api_key:
+                logger.warning("AI reasoning requested but no API keys configured")
+                return self._create_basic_pending_response(statement)
+            return await self._verify_with_ai_reasoning(statement)
                 
         except Exception as e:
             logger.error("AI verification failed", error=str(e))
@@ -183,44 +174,6 @@ class AIAgent(BaseAgent):
                         error=str(e))
         
         return None
-    
-    async def _verify_hybrid(self, statement: Statement, statement_id: Optional[str] = None) -> MinerResponse:
-        """
-        Hybrid approach: Try resolution API first, then AI reasoning, then ensemble.
-        """
-        results = []
-        
-        # First, try the resolution API if we have a statement ID
-        if statement_id:
-            try:
-                api_result = await self._verify_with_resolution_api(statement, statement_id)
-                if api_result:
-                    results.append(("resolution_api", api_result))
-                    logger.info("Resolution found in API", statement_id=statement_id)
-            except Exception as e:
-                logger.debug("Resolution API failed", statement_id=statement_id, error=str(e))
-        
-        # Try AI reasoning approach (if API keys are configured)
-        if self.openai_api_key or self.anthropic_api_key:
-            try:
-                ai_result = await self._verify_with_ai_reasoning(statement)
-                results.append(("ai_reasoning", ai_result))
-            except Exception as e:
-                logger.debug("AI reasoning failed", error=str(e))
-        else:
-            logger.info("No AI API keys configured, skipping AI reasoning")
-        
-        # If we have multiple results, ensemble them
-        if len(results) > 1:
-            return self._ensemble_results(statement, results)
-        elif len(results) == 1:
-            return results[0][1]
-        else:
-            # If no AI keys are configured and no resolution found, provide a basic response
-            if not self.openai_api_key and not self.anthropic_api_key:
-                return self._create_basic_pending_response(statement)
-            else:
-                return self._create_error_response(statement, "All verification methods failed")
     
     async def _analyze_statement(self, statement: Statement) -> Dict[str, Any]:
         """
@@ -478,33 +431,6 @@ class AIAgent(BaseAgent):
             summary=ai_result.get("summary", "AI analysis"),
             sources=ai_result.get("sources", ["ai_reasoning"]),
             reasoning=ai_result.get("key_evidence", "AI-powered analysis")
-        )
-    
-    def _ensemble_results(self, statement: Statement, results: List) -> MinerResponse:
-        """Combine multiple results using ensemble methods."""
-        # Simple ensemble: average confidence, majority vote on resolution
-        resolutions = [result[1].resolution for result in results]
-        confidences = [result[1].confidence for result in results]
-        summaries = [f"{result[0]}: {result[1].summary}" for result in results]
-        sources = []
-        for result in results:
-            sources.extend(result[1].sources)
-        
-        # Majority vote
-        from collections import Counter
-        resolution_counts = Counter(resolutions)
-        final_resolution = resolution_counts.most_common(1)[0][0]
-        
-        # Average confidence
-        final_confidence = sum(confidences) / len(confidences)
-        
-        return MinerResponse(
-            statement=statement.statement,
-            resolution=final_resolution,
-            confidence=final_confidence,
-            summary=f"Ensemble result from {len(results)} methods: " + "; ".join(summaries),
-            sources=list(set(sources)),
-            reasoning=f"Combined analysis from {len(results)} verification methods"
         )
     
     def _create_basic_pending_response(self, statement: Statement) -> MinerResponse:
