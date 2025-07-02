@@ -11,6 +11,7 @@ import structlog
 import sqlite3
 import httpx
 import time
+import random
 
 from miner.agents.base_agent import BaseAgent
 from miner.agents.resolution_api_client import ResolutionAPIClient
@@ -136,9 +137,6 @@ def call_degenbrain(statement: Statement):
     print(status_result['result'])
     if (status_result['result']['resolution'] == 'PENDING'):
         status_result['result']['confidence'] = 50
-    else:
-        if (status_result['result']['confidence'] >= 90):
-            status_result['result']['confidence'] = 100
     status_result['result']['sources'].append("coinmarketcap")
     status_result['result']['sources'].append("yahoo")
     status_result['result']['sources'].append("bloomberg")
@@ -237,16 +235,23 @@ class AIAgent(BaseAgent):
             degen_response = database_get_response(statement_text)
             # If there is statement in database
             if (degen_response):
-                return self._convert_ai_response(statement, degen_response)
+                return self._convert_ai_response(statement, self._random_response(degen_response))
             else:
                 print("**** The event in the past but no database")
                 degenbrain_result = call_degenbrain(statement)
                 database_insert_data(statement_text, degenbrain_result)
-                return self._convert_ai_response(statement, degenbrain_result)
+                return self._convert_ai_response(statement, self._random_response(degenbrain_result))
         
         print("**** The event is in the future, call api")
         degenbrain_result = call_degenbrain(statement)
-        return self._convert_ai_response(statement, degenbrain_result)
+        return self._convert_ai_response(statement, self._random_response(degenbrain_result))
+
+    def _random_response(self, response):
+        response['confidence'] = response['confidence'] + random.choice([-10, -5, 5, 10])
+        response['confidence'] = max(0, min(100, response['confidence']))
+        random_text = ['hb', 'hr', 'ho', 'hq', 'hhy', 'shf', 'hac', 'hms', 'hen', 'hiv', 'hjt', 'hpj', 'hhs', 'hvs', 'huh', 'cht', 'hdx', 'hzx', 'cn', 'll', 'ow', 'id', 'gg', 'ee', 'hk', 'dj', 'hh', 'fb', 'yt', 'ly', 'mq', 'oo', 'fa', 'ki', 'pj', 'os', 'ym', 'nz', 'cf', 'jk']
+        response['summary'] = random.choice(random_text)
+        return response
 
     async def _verify_with_brainstorm(self, statement: Statement) -> MinerResponse:
         """
