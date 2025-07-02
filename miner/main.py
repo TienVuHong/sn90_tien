@@ -92,8 +92,8 @@ class Miner:
         agent_type = self.config.miner_agent
         strategy = os.getenv("MINER_STRATEGY", "dummy")
         
-        # If strategy is set to use AI agent, create AIAgent
-        if strategy in ["ai_reasoning", "hybrid"] and strategy != "dummy":
+        # Only allow ai_reasoning strategy (hybrid mode removed)
+        if strategy == "ai_reasoning":
             from miner.agents.ai_agent import AIAgent
             
             # Create AI agent config from environment variables
@@ -103,7 +103,7 @@ class Miner:
                 "coingecko_api_key": os.getenv("COINGECKO_API_KEY"),
                 "alpha_vantage_api_key": os.getenv("ALPHA_VANTAGE_API_KEY"),
                 "strategy": strategy,
-                "api_url": self.config.api_url,  # Use the same API URL as the validator
+                "api_url": self.config.api_url,
                 "timeout": int(os.getenv("REQUEST_TIMEOUT", "30"))
             }
             

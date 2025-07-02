@@ -288,5 +288,5 @@ class TestSubnetConfig:
         
         config = SubnetConfig.from_env(env)
         assert config.validator_port == 8090  # Default
-        assert config.miner_agent == "hybrid"  # Default
+        assert config.miner_agent == "dummy"  # Default
         assert config.cache_duration == 300  # Default

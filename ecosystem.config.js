@@ -3,6 +3,7 @@ const fs = require("fs");
 
 // Base directory
 const base = path.resolve(__dirname);
+const venvPath = path.join(base, ".venv");
 
 // Helper to check if hotkey exists
 const hotkeyExists = (walletName, hotkeyName) => {
@@ -13,6 +14,8 @@ const hotkeyExists = (walletName, hotkeyName) => {
 // Base configuration for all apps
 const baseConfig = {
   interpreter: path.join(base, ".venv", "bin", "python3"),
+  exec_interpreter: "python3",
+  exec_mode: "fork",
   cwd: base,
   error_file: path.join(base, "logs"),
   out_file: path.join(base, "logs"),
@@ -69,7 +72,8 @@ minerConfigs.forEach(config => {
         MINER_PORT: config.port,
         MINER_STRATEGY: process.env.MINER_STRATEGY || "ai_reasoning",
         MINER_ID: config.name,
-        STRATEGY_WEIGHTS: process.env.STRATEGY_WEIGHTS || '{"ai": 0.6, "heuristic": 0.4}'
+        VIRTUAL_ENV: venvPath,
+        PATH: `${path.join(venvPath, "bin")}:${process.env.PATH}`
       }
     });
   }
